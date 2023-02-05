@@ -13,17 +13,20 @@ import numpy as np
 import matplotlib.pyplot as plt
 from keras.models import load_model
 class DELAFO:
-    def __init__(self,model_name,model,X,y,tickers,timesteps_input=64,timesteps_output=19):
+   def __init__(self,model_name,model,X,y,tickers,alpha = 0.5,timesteps_input=64,timesteps_output=19, data_from = 2016, data_to = 2022):
         self.model_name = model_name
         self.model = model
+        self.alpha = alpha
         self.X,self.y,self.tickers = X,y,tickers
         self.timesteps_input = timesteps_input
         self.timesteps_output = timesteps_output
+        self.data_from = data_from
+        self.data_to = data_to
 
     @classmethod
-    def from_existing_config(cls,path_data,model_name,model_config_path,timesteps_input=64,timesteps_output=19):
+    def from_existing_config(cls,path_data,model_name,model_config_path,timesteps_input=64,timesteps_output=19, data_from = 2016, data_to = 2022):
 
-        X,y,tickers = prepair_data(path_data,window_x=timesteps_input,window_y=timesteps_output)
+        X,y,tickers = prepair_data(path_data,window_x=timesteps_input,window_y=timesteps_output, data_from = data_from, data_to = data_to)
 
         if model_name == "ResNet":
             hyper_params = load_config_file(model_config_path[model_name])
@@ -36,6 +39,17 @@ class DELAFO:
 
             model = build_gru_model(hyper_params)
         elif model_name == "LSTM":
+            hyper_params = load_config_file(model_config_path[model_name])
+            hyper_params['input_shape'] = (X.shape[1],X.shape[2],X.shape[3])
+
+            model = build_lstm_model(hyper_params)
+            
+       elif model_name == "BiGRU":
+            hyper_params = load_config_file(model_config_path[model_name])
+            hyper_params['input_shape'] = (X.shape[1],X.shape[2],X.shape[3])
+
+            model = build_gru_model(hyper_params)
+        elif model_name == "BiLSTM":
             hyper_params = load_config_file(model_config_path[model_name])
             hyper_params['input_shape'] = (X.shape[1],X.shape[2],X.shape[3])
 
@@ -86,17 +100,25 @@ class DELAFO:
 
     def train_model(self,n_fold,batch_size,epochs):
         tscv = TimeSeriesSplit(n_splits=n_fold)
+        all_ratio = []
         for train_index, test_index in tscv.split(self.X):
 
             X_tr, X_val = self.X[train_index], self.X[test_index[range(self.timesteps_output-1,len(test_index),self.timesteps_output)]]
             y_tr, y_val = self.y[train_index], self.y[test_index[range(self.timesteps_output-1,len(test_index),self.timesteps_output)]]
 
             his = self.model.fit(X_tr, y_tr, batch_size=batch_size, epochs= epochs,validation_data=(X_val,y_val))
-            mask_tickers = self.predict_portfolio(X_val)
+            mask_tickers = self.predict_portfolio(X_val,alpha)
+            temp = [self.calc_sharpe_ratio(mask_tickers[i],y_val[i]) for i in range(len(y_val))]
+            all_ratio.append(temp)
             print('Sharpe ratio of this portfolio: %s' % str([self.calc_sharpe_ratio(mask_tickers[i],y_val[i]) for i in range(len(y_val))]))
 
             self.write_log(his,'./logs/%s' % self.model_name,"log_%d.txt"%(test_index[-1]))
+        
+        all_ratio = np.asarray(all_ratio)
+        mean_all_ratio = np.mean(all_ratio, axis= 1)
+        print('Mean: {}, std {}'.format(np.mean(mean_all_ratio), np.std(mean_all_ratio)))
         self.visualize_log('./logs',self.model_name)
+    
 
     def save_model(self,path_dir="pretrain_model"):
         if os.path.exists(os.path.join(path_dir,self.model_name))==False:
@@ -109,9 +131,9 @@ class DELAFO:
         self.model.save(os.path.join(path_dir,self.model_name,str(ver) + '.h5'))
         print("Model saved at %s" % os.path.join(path_dir,self.model_name))
 
-    def predict_portfolio(self,X):
+    def predict_portfolio(self,X, alpha):
         results = self.model.predict(X)
-        mask_tickers = results>0.5
+        mask_tickers = results> alpha
         print("There are total %d samples to predict" % len(results))
         for i in range(len(mask_tickers)):
             print('Sample %d : [ %s ]' % (i, ' '.join([self.tickers[j] for j in range(len(self.tickers)) if mask_tickers[i][j]==1])))
@@ -157,6 +179,8 @@ if __name__ =="__main__":
     model_config_path = {'ResNet':"./config/resnet_hyper_params.json",
                         'GRU': "./config/gru_hyper_params.json",
                         'LSTM':"./config/lstm_hyper_params.json",
+                        'BiGRU': "./config/gru_hyper_params.json",
+                        'BiLSTM':"./config/lstm_hyper_params.json",
                         'AA_GRU':"./config/gru_hyper_params.json",
                         'AA_LSTM':"./config/lstm_hyper_params.json",
                         'SA_GRU':"./config/gru_hyper_params.json",
@@ -167,14 +191,17 @@ if __name__ =="__main__":
     parser.add_argument('--load_pretrained', type=bool, default=False,help='Load pretrain model')
     parser.add_argument('--model_path', type=str, default='',help='Path to pretrain model')
     parser.add_argument('--timesteps_input', type=int, default=64,help='timesteps (days) for input data')
-    parser.add_argument('--timesteps_output', type=int, default=19,help='Timesteps (days) for output data ')
+    parser.add_argument('--timesteps_output', type=int, default=19,help='timesteps (days) for output data ')
+    parser.add_argument('--alpha', type=int, default=0.5,help='Input Threshold')
+    parser.add_argument('--data_from', type=int, default=2016,help='Get data from year')
+    parser.add_argument('--data_to', type=int, default=2022,help='Get data until year')
     args = parser.parse_args()
 
     if args.load_pretrained == False:
         delafo = DELAFO.from_existing_config(args.data_path,args.model,model_config_path,args.timesteps_input,args.timesteps_output)
-        delafo.train_model(n_fold=10,batch_size=16,epochs=300)
+        delafo.train_model(n_fold=10,batch_size=32,epochs=300)
         delafo.save_model()
     else:
         delafo = DELAFO.from_saved_model(args.data_path,args.model_path,args.timesteps_output)
-        delafo.train_model(n_fold=10,batch_size=16,epochs=300)
+        delafo.train_model(n_fold=10,batch_size=32,epochs=300)
         delafo.save_model()
