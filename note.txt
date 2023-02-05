@@ -1,0 +1,19 @@
+#### Update main.py 
+-- dòng 60 sửa model.name thành model._name
+
+-- thêm alpha = 0.5
+---- alpha là threshold để xác định ticker có nằm trong portfolio hay không
+---- dòng 16 và 19: hàm init và self.alpha = alpha
+---- dòng 106, dòng 115: hàm train_model
+---- dòng 138: hàm predict_portfolio, mask_tickers = results> alpha
+---- parser.add_argument('--alpha', type=float, default=0.5,help='Input Threshold')
+---- delafo = DELAFO.from_existing_config(args.data_path,args.model,model_config_path,args.alpha,args.timesteps_input,args.timesteps_output)
+     
+-- update model (BiGRU, BiLSTM, SA_BiGRU, SA_BiLSTM, AA_BiGRU, AA_BiLSTM
+---- dòng 25: thêm vào from_existing_config
+---- dòng 183: thêm tên và đường dẫn hyper_params tương ứng
+
+
+#### update folder models
+-- tạo thêm file Bi_RNN_models
+---- function build_bilstm_model và build_bigru_model
