@@ -43,17 +43,16 @@ class DELAFO:
             hyper_params['input_shape'] = (X.shape[1],X.shape[2],X.shape[3])
 
             model = build_lstm_model(hyper_params)
-            
        elif model_name == "BiGRU":
             hyper_params = load_config_file(model_config_path[model_name])
             hyper_params['input_shape'] = (X.shape[1],X.shape[2],X.shape[3])
 
-            model = build_gru_model(hyper_params)
+            model = build_bigru_model(hyper_params)
         elif model_name == "BiLSTM":
             hyper_params = load_config_file(model_config_path[model_name])
             hyper_params['input_shape'] = (X.shape[1],X.shape[2],X.shape[3])
 
-            model = build_lstm_model(hyper_params)
+            model = build_bilstm_model(hyper_params)
         elif model_name == "AA_GRU":
             hyper_params = load_config_file(model_config_path[model_name])
             hyper_params['input_shape'] = (X.shape[1],X.shape[2],X.shape[3])
@@ -63,6 +62,15 @@ class DELAFO:
             hyper_params = load_config_file(model_config_path[model_name])
             hyper_params['input_shape'] = (X.shape[1],X.shape[2],X.shape[3])
             model = build_add_att_lstm_model(hyper_params)
+        elif model_name == "AA_BiGRU":
+            hyper_params = load_config_file(model_config_path[model_name])
+            hyper_params['input_shape'] = (X.shape[1],X.shape[2],X.shape[3])
+            print(hyper_params)
+            model = build_add_att_bigru_model(hyper_params)
+        elif model_name == "AA_BiLSTM":
+            hyper_params = load_config_file(model_config_path[model_name])
+            hyper_params['input_shape'] = (X.shape[1],X.shape[2],X.shape[3])
+            model = build_add_att_bilstm_model(hyper_params)
         elif model_name == "SA_GRU":
             hyper_params = load_config_file(model_config_path[model_name])
             hyper_params['input_shape'] = (X.shape[1],X.shape[2],X.shape[3])
@@ -71,6 +79,14 @@ class DELAFO:
             hyper_params = load_config_file(model_config_path[model_name])
             hyper_params['input_shape'] = (X.shape[1],X.shape[2],X.shape[3])
             model = build_selfatt_lstm_model(hyper_params)
+        elif model_name == "SA_BiGRU":
+            hyper_params = load_config_file(model_config_path[model_name])
+            hyper_params['input_shape'] = (X.shape[1],X.shape[2],X.shape[3])
+            model = build_selfatt_bigru_model(hyper_params)
+        elif model_name == "SA_BiLSTM":
+            hyper_params = load_config_file(model_config_path[model_name])
+            hyper_params['input_shape'] = (X.shape[1],X.shape[2],X.shape[3])
+            model = build_selfatt_bilstm_model(hyper_params)
         model.name = model_name
 
         return cls(model_name,model,X,y,tickers,timesteps_input,timesteps_output)
@@ -183,8 +199,12 @@ if __name__ =="__main__":
                         'BiLSTM':"./config/lstm_hyper_params.json",
                         'AA_GRU':"./config/gru_hyper_params.json",
                         'AA_LSTM':"./config/lstm_hyper_params.json",
+                        'AA_BiGRU':"./config/gru_hyper_params.json",
+                        'AA_BiLSTM':"./config/lstm_hyper_params.json",
                         'SA_GRU':"./config/gru_hyper_params.json",
-                        'SA_LSTM':"./config/lstm_hyper_params.json"}
+                        'SA_LSTM':"./config/lstm_hyper_params.json",
+                        'SA_BiGRU':"./config/gru_hyper_params.json",
+                        'SA_BiLSTM':"./config/lstm_hyper_params.json"}
 
     parser.add_argument('--data_path', type=str, help='Input dir for data')
     parser.add_argument('--model', choices=[m for m in model_config_path], default='AA_GRU')
