@@ -103,7 +103,7 @@ class DELAFO:
          json.dump(his, outfile,cls=MyEncoder, indent=2)
       print("write file log at %s"%(os.path.join(path_dir,name_file)))
    
-   def train_model(self,alpha = 0.5,n_fold,batch_size,epochs):
+   def train_model(self,n_fold,batch_size,epochs,alpha = 0.5):
       tscv = TimeSeriesSplit(n_splits=n_fold)
       all_ratio = []
       for train_index, test_index in tscv.split(self.X):
