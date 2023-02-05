@@ -22,7 +22,7 @@ class DELAFO:
         self.timesteps_output = timesteps_output
     
    @classmethod
-   def from_existing_config(cls,path_data,model_name,model_config_path,timesteps_input=64,timesteps_output=19):
+   def from_existing_config(cls,path_data,model_name,model_config_path,alpha = 0.5,timesteps_input=64,timesteps_output=19):
          
          X,y,tickers = prepair_data(path_data,window_x=timesteps_input,window_y=timesteps_output)
          if model_name == "ResNet":
@@ -103,7 +103,7 @@ class DELAFO:
          json.dump(his, outfile,cls=MyEncoder, indent=2)
       print("write file log at %s"%(os.path.join(path_dir,name_file)))
    
-   def train_model(self,n_fold,batch_size,epochs):
+   def train_model(self,alpha = 0.5,n_fold,batch_size,epochs):
       tscv = TimeSeriesSplit(n_splits=n_fold)
       all_ratio = []
       for train_index, test_index in tscv.split(self.X):
@@ -135,7 +135,7 @@ class DELAFO:
       self.model.save(os.path.join(path_dir,self.model_name,str(ver) + '.h5'))
       print("Model saved at %s" % os.path.join(path_dir,self.model_name))
 
-   def predict_portfolio(self,X, alpha):
+   def predict_portfolio(self,X,alpha = 0.5):
       results = self.model.predict(X)
       mask_tickers = results> alpha
       print("There are total %d samples to predict" % len(results))
@@ -200,14 +200,14 @@ if __name__ =="__main__":
     parser.add_argument('--model_path', type=str, default='',help='Path to pretrain model')
     parser.add_argument('--timesteps_input', type=int, default=64,help='timesteps (days) for input data')
     parser.add_argument('--timesteps_output', type=int, default=19,help='timesteps (days) for output data ')
-    parser.add_argument('--alpha', type=int, default=0.5,help='Input Threshold')
+    parser.add_argument('--alpha', type=float, default=0.5,help='Input Threshold')
     args = parser.parse_args()
 
     if args.load_pretrained == False:
-        delafo = DELAFO.from_existing_config(args.data_path,args.model,model_config_path,args.timesteps_input,args.timesteps_output)
-        delafo.train_model(n_fold=10,batch_size=32,epochs=300)
+        delafo = DELAFO.from_existing_config(args.data_path,args.model,model_config_path,args.alpha,args.timesteps_input,args.timesteps_output)
+        delafo.train_model(n_fold=10,batch_size=64,epochs=300)
         delafo.save_model()
     else:
         delafo = DELAFO.from_saved_model(args.data_path,args.model_path,args.timesteps_output)
-        delafo.train_model(n_fold=10,batch_size=32,epochs=300)
+        delafo.train_model(n_fold=10,batch_size=64,epochs=300)
         delafo.save_model()
