@@ -20,9 +20,9 @@ class DELAFO:
         self.X,self.y,self.tickers = X,y,tickers
         self.timesteps_input = timesteps_input
         self.timesteps_output = timesteps_output
-
-    @classmethod
-    def from_existing_config(cls,path_data,model_name,model_config_path,timesteps_input=64,timesteps_output=19):
+    
+   @classmethod
+   def from_existing_config(cls,path_data,model_name,model_config_path,timesteps_input=64,timesteps_output=19):
 
         X,y,tickers = prepair_data(path_data,window_x=timesteps_input,window_y=timesteps_output)
 
