@@ -4,6 +4,8 @@ from utils import *
 from models.addatt_RNN import *
 from models.attention_layer import *
 from models.RNN_models import *
+
+from models.Bi_RNN_models import *
 from models.selfatt_RNN import *
 from models.resnet import *
 from sklearn.model_selection import TimeSeriesSplit
