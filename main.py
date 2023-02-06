@@ -109,7 +109,7 @@ class DELAFO:
       tscv = TimeSeriesSplit(n_splits=n_fold)
       all_ratio = []
       for train_index, test_index in tscv.split(self.X):
-
+         all_ratio_k_fold = []
          X_tr, X_val = self.X[train_index], self.X[test_index[range(self.timesteps_output-1,len(test_index),self.timesteps_output)]]
          y_tr, y_val = self.y[train_index], self.y[test_index[range(self.timesteps_output-1,len(test_index),self.timesteps_output)]]
 
@@ -117,6 +117,7 @@ class DELAFO:
          mask_tickers = self.predict_portfolio(X_val,alpha)
          temp = [self.calc_sharpe_ratio(mask_tickers[i],y_val[i]) for i in range(len(y_val))]
          all_ratio.append(temp)
+         all_ratio_k_fold.append(temp)
          print('Sharpe ratio of this portfolio: %s' % str([self.calc_sharpe_ratio(mask_tickers[i],y_val[i]) for i in range(len(y_val))]))
          all_ratio_k_fold = np.asarray(all_ratio)
          mean_all_ratio_k_fold  = np.mean(all_ratio_k_fold , axis= 1)
