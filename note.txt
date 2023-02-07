@@ -17,3 +17,12 @@
 #### update folder models
 -- tạo thêm file Bi_RNN_models
 ---- function build_bilstm_model và build_bigru_model
+
+### update model/attention_layer.py
+-- thêm function: 	
+def get_config(self):
+	config = super(AdditiveAttentionLayer, self).get_config()
+	config.update({
+					"arg1": self.latent_dim,
+					"arg2": self.kernel_regularizer,})
+	return config
