@@ -2,6 +2,7 @@ from keras.layers import Input, Activation, Dense,Flatten, BatchNormalization, A
 from keras.layers import AveragePooling2D,Permute,Reshape,LSTM,Lambda,GRU,Bidirectional,BatchNormalization,Concatenate
 from keras import regularizers
 from keras.optimizers import Adam
+from models.attention_layer import *
 from utils import sharpe_ratio_loss,sharpe_ratio
 import keras.backend as K
 from keras.models import Model
