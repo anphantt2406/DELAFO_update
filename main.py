@@ -216,7 +216,7 @@ if __name__ =="__main__":
 
     if args.load_pretrained == False:
         delafo = DELAFO.from_existing_config(args.data_path,args.model,model_config_path,args.alpha,args.timesteps_input,args.timesteps_output,args.n_fold,args.batch_size,args.epochs)
-        delafo.train_model(n_fold, batch_size, epochs, alpha)
+        delafo.train_model(args.n_fold,args.batch_size,args.epochs,args.alpha)
         delafo.save_model()
     else:
         delafo = DELAFO.from_saved_model(args.data_path,args.model_path,args.timesteps_output)
