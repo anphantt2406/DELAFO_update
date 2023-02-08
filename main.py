@@ -127,7 +127,7 @@ class DELAFO:
          print('Sharpe ratio of this portfolio: %s' % str([self.calc_sharpe_ratio(mask_tickers[i],y_val[i]) for i in range(len(y_val))]))
          # all_ratio_k_fold = np.asarray(all_ratio)
          # mean_all_ratio_k_fold  = np.mean(all_ratio_k_fold , axis= 1)
-         print('For this _k_fold, Mean: {}, std {}'.format(k,np.mean(temp ), np.std(temp )))
+         print('For this fold_{}, Mean: {}, std {}'.format(k,np.mean(temp ), np.std(temp )))
          self.write_log(his,'./logs/%s' % self.model_name,"log_%d.txt"%(test_index[-1]))
 
       all_ratio = np.asarray(all_ratio)
