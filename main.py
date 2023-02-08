@@ -15,16 +15,19 @@ import numpy as np
 import matplotlib.pyplot as plt
 from keras.models import load_model
 class DELAFO:
-   def __init__(self,model_name,model,X,y,tickers,alpha = 0.5,timesteps_input=64,timesteps_output=19):
+   def __init__(self,model_name,model,X,y,tickers,alpha = 0.5,timesteps_input=64,timesteps_output=19, n_fold = 10 ,batch_size = 64, epochs = 300):
         self.model_name = model_name
         self.model = model
         self.alpha = alpha
         self.X,self.y,self.tickers = X,y,tickers
         self.timesteps_input = timesteps_input
         self.timesteps_output = timesteps_output
+        self.n_fold = n_fold
+        self.batch_size = batch_size
+        self.epochs = epochs
     
    @classmethod
-   def from_existing_config(cls,path_data,model_name,model_config_path,alpha = 0.5,timesteps_input=64,timesteps_output=19):
+   def from_existing_config(cls,path_data,model_name,model_config_path,alpha = 0.5,timesteps_input=64,timesteps_output=19, n_fold = 10 ,batch_size = 64, epochs = 300):
          
          X,y,tickers = prepair_data(path_data,window_x=timesteps_input,window_y=timesteps_output)
          if model_name == "ResNet":
@@ -105,7 +108,7 @@ class DELAFO:
          json.dump(his, outfile,cls=MyEncoder, indent=2)
       print("write file log at %s"%(os.path.join(path_dir,name_file)))
    
-   def train_model(self,n_fold,batch_size,epochs,alpha = 0.5):
+   def train_model(self,n_fold = 10, batch_size = 64, epochs = 300, alpha = 0.5):
       tscv = TimeSeriesSplit(n_splits=n_fold)
       all_ratio = []
       for train_index, test_index in tscv.split(self.X):
@@ -205,11 +208,14 @@ if __name__ =="__main__":
     parser.add_argument('--model_path', type=str, default='',help='Path to pretrain model')
     parser.add_argument('--timesteps_input', type=int, default=64,help='timesteps (days) for input data')
     parser.add_argument('--timesteps_output', type=int, default=19,help='timesteps (days) for output data ')
-    parser.add_argument('--alpha', type=float, default=0.5,help='Input Threshold')
+    parser.add_argument('--alpha', type=float, default=0.5,help='Input Threshold')    
+    parser.add_argument('--n_fold', type=int, default=10 , help='n_fold')
+    parser.add_argument('--batch_size', type=int, default=64,help='batch_size')
+    parser.add_argument('--epochs', type=float, default= 300,help='epochs')
     args = parser.parse_args()
 
     if args.load_pretrained == False:
-        delafo = DELAFO.from_existing_config(args.data_path,args.model,model_config_path,args.alpha,args.timesteps_input,args.timesteps_output)
+        delafo = DELAFO.from_existing_config(args.data_path,args.model,model_config_path,args.alpha,args.timesteps_input,args.timesteps_output,args.n_fold,args.batch_size,args.epochs)
         delafo.train_model(n_fold=10,batch_size=64,epochs=300)
         delafo.save_model()
     else:
