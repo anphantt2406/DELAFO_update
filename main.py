@@ -211,12 +211,12 @@ if __name__ =="__main__":
     parser.add_argument('--alpha', type=float, default=0.5,help='Input Threshold')    
     parser.add_argument('--n_fold', type=int, default=10 , help='n_fold')
     parser.add_argument('--batch_size', type=int, default=64,help='batch_size')
-    parser.add_argument('--epochs', type=float, default= 300,help='epochs')
+    parser.add_argument('--epochs', type=int, default= 300,help='epochs')
     args = parser.parse_args()
 
     if args.load_pretrained == False:
         delafo = DELAFO.from_existing_config(args.data_path,args.model,model_config_path,args.alpha,args.timesteps_input,args.timesteps_output,args.n_fold,args.batch_size,args.epochs)
-        delafo.train_model(n_fold=10,batch_size=64,epochs=300)
+        delafo.train_model()
         delafo.save_model()
     else:
         delafo = DELAFO.from_saved_model(args.data_path,args.model_path,args.timesteps_output)
