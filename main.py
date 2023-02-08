@@ -83,6 +83,7 @@ class DELAFO:
             hyper_params['input_shape'] = (X.shape[1],X.shape[2],X.shape[3])
             model = build_selfatt_bilstm_model(hyper_params)
          model._name = model_name
+         print(model.summary())
          return cls(model_name,model,X,y,tickers,timesteps_input,timesteps_output)
       
    @classmethod
@@ -133,6 +134,15 @@ class DELAFO:
       mean_all_ratio = np.mean(all_ratio, axis= 1)
       print('Mean: {}, std {}'.format(np.mean(mean_all_ratio), np.std(mean_all_ratio)))
       self.visualize_log('./logs',self.model_name)
+      his1 = his.history
+      # summarize history for loss
+      plt.plot(his.history['loss'])
+      plt.plot(his.history['val_loss'])
+      plt.title('model loss')
+      plt.ylabel('loss')
+      plt.xlabel('epoch')
+      plt.legend(['train', 'test'], loc='upper left')
+      plt.show()
     
    def save_model(self,path_dir="pretrain_model"):
       if os.path.exists(os.path.join(path_dir,self.model_name))==False:
