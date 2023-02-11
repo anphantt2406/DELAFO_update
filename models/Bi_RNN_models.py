@@ -126,7 +126,7 @@ def build_selfatt_bilstm_model(params):
     reshape_inp = Lambda(lambda x: K.permute_dimensions(x,pattern=(0,2,1,3))) (input)
     reshape_inp = Reshape((ts,-1)) (reshape_inp)
 
-    # batch_norm = BatchNormalization()(reshape_inp)
+    batch_norm = BatchNormalization()(reshape_inp)
     prob = SelfAttentionLayer(latent_dim=32,name='Att',kernel_regularizer=regularizers.l2(reg1))(reshape_inp)
 
     att = Lambda(lambda x: K.batch_dot(x[0],x[1]) ) ([prob,reshape_inp])
