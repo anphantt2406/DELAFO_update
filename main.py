@@ -4,6 +4,7 @@ from utils import *
 from models.addatt_RNN import *
 from models.attention_layer import *
 from models.RNN_models import *
+import tensorflow as tf
 
 from models.Bi_RNN_models import *
 from models.selfatt_RNN import *
@@ -110,6 +111,7 @@ class DELAFO:
       print("write file log at %s"%(os.path.join(path_dir,name_file)))
    
    def train_model(self,n_fold = 10, batch_size = 64, epochs = 300, alpha = 0.5):
+      tf.random.set_seed(42)
       tscv = TimeSeriesSplit(n_splits=n_fold)
       all_ratio = []
 #       for train_index, test_index in tscv.split(self.X):
