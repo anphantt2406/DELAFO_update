@@ -17,8 +17,8 @@ def prepair_data(path,window_x,window_y):
     columns = df.close.columns[~df.close.iloc[-1].isna()]
     df = df.iloc[:, df.columns.get_level_values(1).isin(columns)]
 
-    # df.volume = df.volume.interpolate(method='linear',limit_area='inside',limit_direction='both', axis=0)
-    df.volume = df.volume.fillna(0)
+    df.volume = df.volume.interpolate(method='linear',limit_area='inside',limit_direction='both', axis=0)
+#     df.volume = df.volume.fillna(0)
     df.close = df.close.interpolate(method='linear',limit_area='inside',limit_direction='both', axis=0)
 
     close = df.close
