@@ -20,8 +20,8 @@ def prepair_data(path,window_x,window_y):
 
     df.volume = df.volume.interpolate(method='linear',limit_area='inside',limit_direction='both', axis=0)
     df.close = df.close.interpolate(method='linear',limit_area='inside',limit_direction='both', axis=0)
-
-
+    
+    # method='ffill'
 
     close = df.close
     daily_return = ((close.shift(-1) - close)/close).shift(1)
