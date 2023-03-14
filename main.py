@@ -26,7 +26,7 @@ class DELAFO:
         self.n_fold = n_fold
         self.batch_size = batch_size
         self.epochs = epochs
-        self.activation = "sigmoid"
+        self.activation = activation
         self.l2 = l2
         self.l2_1 = l2_1
         self.l2_2 = l2_2
