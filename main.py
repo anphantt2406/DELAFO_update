@@ -252,7 +252,7 @@ if __name__ =="__main__":
     args = parser.parse_args()
 
     if args.load_pretrained == False:
-        delafo = DELAFO.from_existing_config(args.data_path,args.model,model_config_path,args.alpha,args.timesteps_input,args.timesteps_output,args.n_fold,args.batch_size,args.epochs,args.l2,args.l2_1,args.l2_2,args.units)
+        delafo = DELAFO.from_existing_config(args.data_path,args.model,args.alpha,args.timesteps_input,args.timesteps_output,args.n_fold,args.batch_size,args.epochs,args.l2,args.l2_1,args.l2_2,args.units)
         delafo.train_model(args.n_fold,args.batch_size,args.epochs,args.alpha)
         delafo.save_model()
     else:
