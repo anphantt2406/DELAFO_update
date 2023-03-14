@@ -122,9 +122,8 @@ class DELAFO:
 #             model = build_selfatt_bilstm_model(hyper_params)
 	@classmethod
 	def from_saved_model(cls,path_data,model_path,timesteps_output):
-      '''  If you load pretrain model with new custom layer, you should put it in custom_objects
-         below.
-      '''
+		'''  If you load pretrain model with new custom layer, you should put it in custom_objects below.
+		'''
 		model = load_model(model_path,custom_objects={"AdditiveAttentionLayer":AdditiveAttentionLayer,
 							      "SelfAttentionLayer":SelfAttentionLayer,
 							      "sharpe_ratio_loss":sharpe_ratio_loss,
@@ -197,8 +196,7 @@ class DELAFO:
 		return mask_tickers
 	
 	def calc_sharpe_ratio(self,weight,y):
-      """Here y is the daily return have the shape (tickers,days)
-      weight have the shape (tickers,)"""
+		"""Here y is the daily return have the shape (tickers,days) weight have the shape (tickers,)"""
 		epsilon = 1e-6
 		weights = np.round(weight)
 		sum_w = np.clip(weights.sum(),epsilon,y.shape[0])
