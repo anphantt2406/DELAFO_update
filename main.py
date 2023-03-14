@@ -5,7 +5,6 @@ from models.addatt_RNN import *
 from models.attention_layer import *
 from models.RNN_models import *
 import tensorflow as tf
-
 from models.Bi_RNN_models import *
 from models.selfatt_RNN import *
 from models.resnet import *
@@ -31,16 +30,15 @@ class DELAFO:
 		self.l2_1 = l2_1
 		self.l2_2 = l2_2
 		self.units = units
-   
-   @classmethod
-   def from_existing_config(cls,path_data,model_name,alpha = 0.5,timesteps_input=64,timesteps_output=19,n_fold=10,batch_size=64,epochs=300,activation="sigmoid",l2=0.05,l2_1=0.01,l2_2= 0.01,units=32):
+	@classmethod
+	def from_existing_config(cls,path_data,model_name,alpha = 0.5,timesteps_input=64,timesteps_output=19,n_fold=10,batch_size=64,epochs=300,activation="sigmoid",l2=0.05,l2_1=0.01,l2_2= 0.01,units=32):
 		X,y,tickers = prepair_data(path_data,window_x=timesteps_input,window_y=timesteps_output)
 		if model_name == "GRU":
-        	hyper_params = {"activation": activation,
-            	             "l2": l2,
-                	         "l2_1": l2_1,
-                        	 "l2_2": l2_2,
-                    	     "units": units
+			hyper_params = {"activation": activation,
+							"l2": l2,
+                	        "l2_1": l2_1,
+                        	"l2_2": l2_2,
+                    	    "units": units
                         	}
          	hyper_params['input_shape'] = (X.shape[1],X.shape[2],X.shape[3])
          	model = build_gru_model(hyper_params)
@@ -126,9 +124,8 @@ class DELAFO:
 # #             hyper_params = load_config_file(model_config_path[model_name])
 #             hyper_params['input_shape'] = (X.shape[1],X.shape[2],X.shape[3])
 #             model = build_selfatt_bilstm_model(hyper_params)
-      
-   @classmethod
-   def from_saved_model(cls,path_data,model_path,timesteps_output):
+	@classmethod
+	def from_saved_model(cls,path_data,model_path,timesteps_output):
       '''  If you load pretrain model with new custom layer, you should put it in custom_objects
          below.
       '''
@@ -141,16 +138,16 @@ class DELAFO:
 		timesteps_input = input_shape[2]
 		X,y,tickers = prepair_data(path_data,window_x=timesteps_input,window_y=timesteps_output)
 		return cls(model_name,model,X,y,tickers,timesteps_input,timesteps_output)
-
-   def write_log(self,history,path_dir,name_file):
+	
+	def write_log(self,history,path_dir,name_file):
 		his = history.history
 		if os.path.exists(path_dir)==False:
 			os.makedirs(path_dir)
 		with open(os.path.join(path_dir,name_file), 'w') as outfile:
 			json.dump(his, outfile,cls=MyEncoder, indent=2)
 		print("write file log at %s"%(os.path.join(path_dir,name_file)))
-   
-   def train_model(self,n_fold = 10, batch_size = 64, epochs = 300, alpha = 0.5):
+	
+	def train_model(self,n_fold = 10, batch_size = 64, epochs = 300, alpha = 0.5):
 		tf.random.set_seed(42)
 		tscv = TimeSeriesSplit(n_splits=n_fold)
 		all_ratio = []
@@ -183,8 +180,8 @@ class DELAFO:
 		plt.xlabel('epoch')
 		plt.legend(['train', 'test'], loc='upper left')
 		plt.show()
-    
-   def save_model(self,path_dir="pretrain_model"):
+	
+	def save_model(self,path_dir="pretrain_model"):
 		if os.path.exists(os.path.join(path_dir,self.model_name))==False:
 			os.makedirs(os.path.join(path_dir,self.model_name))
 		ver = list(map(lambda x: int(x.split('.')[0]),[file for file in os.listdir(os.path.join(path_dir,self.model_name)) if file.endswith('.h5')]))
@@ -194,16 +191,16 @@ class DELAFO:
 			ver = 0
 		self.model.save(os.path.join(path_dir,self.model_name,str(ver) + '.h5'))
 		print("Model saved at %s" % os.path.join(path_dir,self.model_name))
-
-   def predict_portfolio(self,X,alpha = 0.5):
+	
+	def predict_portfolio(self,X,alpha = 0.5):
 		results = self.model.predict(X)
 		mask_tickers = results> alpha
 		print("There are total %d samples to predict" % len(results))
 		for i in range(len(mask_tickers)):
 			print('Sample %d : [ %s ]' % (i, ' '.join([self.tickers[j] for j in range(len(self.tickers)) if mask_tickers[i][j]==1])))
 		return mask_tickers
-
-   def calc_sharpe_ratio(self,weight,y):
+	
+	def calc_sharpe_ratio(self,weight,y):
       """Here y is the daily return have the shape (tickers,days)
       weight have the shape (tickers,)"""
 		epsilon = 1e-6
@@ -214,8 +211,8 @@ class DELAFO:
 		mean = np.mean(port_return)
 		std = np.maximum(np.std(port_return),epsilon)
 		return np.sqrt(self.timesteps_output) * mean/std
-
-   def visualize_log(self,path_folder,model_name):
+	
+	def visualize_log(self,path_folder,model_name):
 		n_cols = 6
 		n_rows = 1
 		fig,axes = plt.subplots(ncols = n_cols,figsize=(20,3))
@@ -233,7 +230,6 @@ class DELAFO:
 			os.makedirs(new_path)
 		plt.savefig(os.path.join(new_path,'1.png'))
 
-
 if __name__ =="__main__":
 	parser = argparse.ArgumentParser()
     ## path for config_file of each model
@@ -250,30 +246,28 @@ if __name__ =="__main__":
 #                         'SA_LSTM':"./config/lstm_hyper_params.json",
 #                         'SA_BiGRU':"./config/gru_hyper_params.json",
 #                         'SA_BiLSTM':"./config/lstm_hyper_params.json"}
-
-    parser.add_argument('--data_path', type=str, help='Input dir for data')
-    parser.add_argument('--model', choices=['GRU','BiGRU','AA_GRU','AA_BiGRU'], default='AA_GRU')
-    parser.add_argument('--load_pretrained', type=bool, default=False,help='Load pretrain model')
-    parser.add_argument('--model_path', type=str, default='',help='Path to pretrain model')
-    parser.add_argument('--timesteps_input', type=int, default=64,help='timesteps (days) for input data')
-    parser.add_argument('--timesteps_output', type=int, default=19,help='timesteps (days) for output data ')
-    parser.add_argument('--alpha', type=float, default=0.5,help='Input Threshold')    
-    parser.add_argument('--n_fold', type=int, default=10 , help='n_fold')
-    parser.add_argument('--batch_size', type=int, default=64,help='batch_size')
-    parser.add_argument('--epochs', type=int, default=300,help='epochs')
-      
-    parser.add_argument('--activation', choices=['sigmoid','softmax'], default= 'sigmoid',help='activation function')
-    parser.add_argument('--l2', type=float, default=0.5,help='l2')    
-    parser.add_argument('--l2_1', type=float, default=0.01 , help='l2_1')
-    parser.add_argument('--l2_2', type=float, default=0.01,help='l2_2')
-    parser.add_argument('--units', type=int, default=32,help='units')
-    args = parser.parse_args()
-
-    if args.load_pretrained == False:
-        delafo = DELAFO.from_existing_config(args.data_path,args.model,args.alpha,args.timesteps_input,args.timesteps_output,args.n_fold,args.batch_size,args.epochs,args.activation, args.l2,args.l2_1,args.l2_2,args.units)
-        delafo.train_model(args.n_fold,args.batch_size,args.epochs,args.alpha)
-        delafo.save_model()
-    else:
-        delafo = DELAFO.from_saved_model(args.data_path,args.model_path,args.timesteps_output)
-        delafo.train_model(n_fold=10,batch_size=64,epochs=300)
-        delafo.save_model()
+	parser.add_argument('--data_path', type=str, help='Input dir for data')
+	parser.add_argument('--model', choices=['GRU','BiGRU','AA_GRU','AA_BiGRU'], default='AA_GRU')
+	parser.add_argument('--load_pretrained', type=bool, default=False,help='Load pretrain model')
+	parser.add_argument('--model_path', type=str, default='',help='Path to pretrain model')
+	parser.add_argument('--timesteps_input', type=int, default=64,help='timesteps (days) for input data')
+	parser.add_argument('--timesteps_output', type=int, default=19,help='timesteps (days) for output data ')
+	parser.add_argument('--alpha', type=float, default=0.5,help='Input Threshold')    
+	parser.add_argument('--n_fold', type=int, default=10 , help='n_fold')
+	parser.add_argument('--batch_size', type=int, default=64,help='batch_size')
+	parser.add_argument('--epochs', type=int, default=300,help='epochs')
+	parser.add_argument('--activation', choices=['sigmoid','softmax'], default= 'sigmoid',help='activation function')
+	parser.add_argument('--l2', type=float, default=0.5,help='l2')    
+	parser.add_argument('--l2_1', type=float, default=0.01 , help='l2_1')
+	parser.add_argument('--l2_2', type=float, default=0.01,help='l2_2')
+	parser.add_argument('--units', type=int, default=32,help='units')
+	args = parser.parse_args()
+	
+	if args.load_pretrained == False:
+		delafo = DELAFO.from_existing_config(args.data_path,args.model,args.alpha,args.timesteps_input,args.timesteps_output,args.n_fold,args.batch_size,args.epochs,args.activation, args.l2,args.l2_1,args.l2_2,args.units)
+		delafo.train_model(args.n_fold,args.batch_size,args.epochs,args.alpha)
+		delafo.save_model()
+	else:
+		delafo = DELAFO.from_saved_model(args.data_path,args.model_path,args.timesteps_output)
+		delafo.train_model(n_fold=10,batch_size=64,epochs=300)
+		delafo.save_model()
