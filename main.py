@@ -16,7 +16,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from keras.models import load_model
 class DELAFO:
-   def __init__(self,model_name,model,X,y,tickers,alpha = 0.5,timesteps_input=64,timesteps_output=19, n_fold = 10 ,batch_size = 64, epochs = 300):
+   def __init__(self,model_name,model,X,y,tickers,alpha = 0.5,timesteps_input=64,timesteps_output=19, n_fold = 10 ,batch_size = 64, epochs = 300, activation = "sigmoid", l2 = 0.05, l2_1 = 0.01, l2_2 = 0.01, units = 32):
         self.model_name = model_name
         self.model = model
         self.alpha = alpha
@@ -26,63 +26,79 @@ class DELAFO:
         self.n_fold = n_fold
         self.batch_size = batch_size
         self.epochs = epochs
+        self.activation = "sigmoid"
+        self.l2 = l2
+        self.l2_1 = l2_1
+        self.l2_2 = l2_2
+        self.units = units
     
    @classmethod
-   def from_existing_config(cls,path_data,model_name,model_config_path,alpha = 0.5,timesteps_input=64,timesteps_output=19, n_fold = 10 ,batch_size = 64, epochs = 300):
-         
+#    def from_existing_config(cls,path_data,model_name,model_config_path,alpha = 0.5,timesteps_input=64,timesteps_output=19, n_fold = 10 ,batch_size = 64, epochs = 300):
+     def from_existing_config(cls,path_data,model_name,alpha = 0.5,timesteps_input=64,timesteps_output=19, n_fold = 10 ,batch_size = 64, epochs = 300, activation = "sigmoid", l2 = 0.05, l2_1 = 0.01, l2_2 = 0.01, units = 32):
          X,y,tickers = prepair_data(path_data,window_x=timesteps_input,window_y=timesteps_output)
-         if model_name == "ResNet":
-            hyper_params = load_config_file(model_config_path[model_name])
-            hyper_params['input_shape'] = (X.shape[1],X.shape[2],X.shape[3])
-            model = build_resnet_model(hyper_params)
-         elif model_name == "GRU":
-            hyper_params = load_config_file(model_config_path[model_name])
-            hyper_params['input_shape'] = (X.shape[1],X.shape[2],X.shape[3])
+         hyper_params = {"activation": activation,
+                         "l2": l2,
+                         "l2_1": l2_1,
+                         "l2_2": l2_2,
+                         "units": units
+                        }
+         hyper_params['input_shape'] = (X.shape[1],X.shape[2],X.shape[3])
+         if model_name == "GRU":
             model = build_gru_model(hyper_params)
-         elif model_name == "LSTM":
-            hyper_params = load_config_file(model_config_path[model_name])
-            hyper_params['input_shape'] = (X.shape[1],X.shape[2],X.shape[3])
-            model = build_lstm_model(hyper_params)
          elif model_name == "BiGRU":
-            hyper_params = load_config_file(model_config_path[model_name])
-            hyper_params['input_shape'] = (X.shape[1],X.shape[2],X.shape[3])
             model = build_bigru_model(hyper_params)
-         elif model_name == "BiLSTM":
-            hyper_params = load_config_file(model_config_path[model_name])
-            hyper_params['input_shape'] = (X.shape[1],X.shape[2],X.shape[3])
-            model = build_bilstm_model(hyper_params)
-         elif model_name == "AA_GRU":
-            hyper_params = load_config_file(model_config_path[model_name])
-            hyper_params['input_shape'] = (X.shape[1],X.shape[2],X.shape[3])
-            model = build_add_att_gru_model(hyper_params)
-         elif model_name == "AA_LSTM":
-            hyper_params = load_config_file(model_config_path[model_name])
-            hyper_params['input_shape'] = (X.shape[1],X.shape[2],X.shape[3])
-            model = build_add_att_lstm_model(hyper_params)
-         elif model_name == "AA_BiGRU":
-            hyper_params = load_config_file(model_config_path[model_name])
-            hyper_params['input_shape'] = (X.shape[1],X.shape[2],X.shape[3])
-            model = build_add_att_bigru_model(hyper_params)
-         elif model_name == "AA_BiLSTM":
-            hyper_params = load_config_file(model_config_path[model_name])
-            hyper_params['input_shape'] = (X.shape[1],X.shape[2],X.shape[3])
-            model = build_add_att_bilstm_model(hyper_params)
-         elif model_name == "SA_GRU":
-            hyper_params = load_config_file(model_config_path[model_name])
-            hyper_params['input_shape'] = (X.shape[1],X.shape[2],X.shape[3])
-            model = build_selfatt_gru_model(hyper_params)
-         elif model_name == "SA_LSTM":
-            hyper_params = load_config_file(model_config_path[model_name])
-            hyper_params['input_shape'] = (X.shape[1],X.shape[2],X.shape[3])
-            model = build_selfatt_lstm_model(hyper_params)
-         elif model_name == "SA_BiGRU":
-            hyper_params = load_config_file(model_config_path[model_name])
-            hyper_params['input_shape'] = (X.shape[1],X.shape[2],X.shape[3])
-            model = build_selfatt_bigru_model(hyper_params)
-         elif model_name == "SA_BiLSTM":
-            hyper_params = load_config_file(model_config_path[model_name])
-            hyper_params['input_shape'] = (X.shape[1],X.shape[2],X.shape[3])
-            model = build_selfatt_bilstm_model(hyper_params)
+#          if model_name == "ResNet":
+#             hyper_params = load_config_file(model_config_path[model_name])
+#             hyper_params['input_shape'] = (X.shape[1],X.shape[2],X.shape[3])
+#             model = build_resnet_model(hyper_params)
+#          elif model_name == "GRU":
+# #             hyper_params = load_config_file(model_config_path[model_name])
+#             hyper_params['input_shape'] = (X.shape[1],X.shape[2],X.shape[3])
+#             model = build_gru_model(hyper_params)
+#          elif model_name == "LSTM":
+# #             hyper_params = load_config_file(model_config_path[model_name])
+#             hyper_params['input_shape'] = (X.shape[1],X.shape[2],X.shape[3])
+#             model = build_lstm_model(hyper_params)
+#          elif model_name == "BiGRU":
+# #             hyper_params = load_config_file(model_config_path[model_name])
+#             hyper_params['input_shape'] = (X.shape[1],X.shape[2],X.shape[3])
+#             model = build_bigru_model(hyper_params)
+#          elif model_name == "BiLSTM":
+# #             hyper_params = load_config_file(model_config_path[model_name])
+#             hyper_params['input_shape'] = (X.shape[1],X.shape[2],X.shape[3])
+#             model = build_bilstm_model(hyper_params)
+#          elif model_name == "AA_GRU":
+# #             hyper_params = load_config_file(model_config_path[model_name])
+#             hyper_params['input_shape'] = (X.shape[1],X.shape[2],X.shape[3])
+#             model = build_add_att_gru_model(hyper_params)
+#          elif model_name == "AA_LSTM":
+# #             hyper_params = load_config_file(model_config_path[model_name])
+#             hyper_params['input_shape'] = (X.shape[1],X.shape[2],X.shape[3])
+#             model = build_add_att_lstm_model(hyper_params)
+#          elif model_name == "AA_BiGRU":
+# #             hyper_params = load_config_file(model_config_path[model_name])
+#             hyper_params['input_shape'] = (X.shape[1],X.shape[2],X.shape[3])
+#             model = build_add_att_bigru_model(hyper_params)
+#          elif model_name == "AA_BiLSTM":
+# #             hyper_params = load_config_file(model_config_path[model_name])
+#             hyper_params['input_shape'] = (X.shape[1],X.shape[2],X.shape[3])
+#             model = build_add_att_bilstm_model(hyper_params)
+#          elif model_name == "SA_GRU":
+# #             hyper_params = load_config_file(model_config_path[model_name])
+#             hyper_params['input_shape'] = (X.shape[1],X.shape[2],X.shape[3])
+#             model = build_selfatt_gru_model(hyper_params)
+#          elif model_name == "SA_LSTM":
+# #             hyper_params = load_config_file(model_config_path[model_name])
+#             hyper_params['input_shape'] = (X.shape[1],X.shape[2],X.shape[3])
+#             model = build_selfatt_lstm_model(hyper_params)
+#          elif model_name == "SA_BiGRU":
+# #             hyper_params = load_config_file(model_config_path[model_name])
+#             hyper_params['input_shape'] = (X.shape[1],X.shape[2],X.shape[3])
+#             model = build_selfatt_bigru_model(hyper_params)
+#          elif model_name == "SA_BiLSTM":
+# #             hyper_params = load_config_file(model_config_path[model_name])
+#             hyper_params['input_shape'] = (X.shape[1],X.shape[2],X.shape[3])
+#             model = build_selfatt_bilstm_model(hyper_params)
          model._name = model_name
          print(model.summary())
          return cls(model_name,model,X,y,tickers,timesteps_input,timesteps_output)
@@ -123,7 +139,7 @@ class DELAFO:
          his = self.model.fit(X_tr, y_tr, batch_size=batch_size, epochs= epochs,validation_data=(X_val,y_val))
          mask_tickers = self.predict_portfolio(X_val,alpha)
          temp = [self.calc_sharpe_ratio(mask_tickers[i],y_val[i]) for i in range(len(y_val))]
-         if k >4:
+         if k >6:
             all_ratio.append(temp)
          # all_ratio_k_fold.append(temp)
          print('Sharpe ratio of this portfolio: %s' % str([self.calc_sharpe_ratio(mask_tickers[i],y_val[i]) for i in range(len(y_val))]))
@@ -202,19 +218,19 @@ class DELAFO:
 if __name__ =="__main__":
     parser = argparse.ArgumentParser()
     ## path for config_file of each model
-    model_config_path = {'ResNet':"./config/resnet_hyper_params.json",
-                        'GRU': "./config/gru_hyper_params.json",
-                        'LSTM':"./config/lstm_hyper_params.json",
-                        'BiGRU': "./config/gru_hyper_params.json",
-                        'BiLSTM':"./config/lstm_hyper_params.json",
-                        'AA_GRU':"./config/gru_hyper_params.json",
-                        'AA_LSTM':"./config/lstm_hyper_params.json",
-                        'AA_BiGRU':"./config/gru_hyper_params.json",
-                        'AA_BiLSTM':"./config/lstm_hyper_params.json",
-                        'SA_GRU':"./config/gru_hyper_params.json",
-                        'SA_LSTM':"./config/lstm_hyper_params.json",
-                        'SA_BiGRU':"./config/gru_hyper_params.json",
-                        'SA_BiLSTM':"./config/lstm_hyper_params.json"}
+#     model_config_path = {'ResNet':"./config/resnet_hyper_params.json",
+#                         'GRU': "./config/gru_hyper_params.json",
+#                         'LSTM':"./config/lstm_hyper_params.json",
+#                         'BiGRU': "./config/gru_hyper_params.json",
+#                         'BiLSTM':"./config/lstm_hyper_params.json",
+#                         'AA_GRU':"./config/gru_hyper_params.json",
+#                         'AA_LSTM':"./config/lstm_hyper_params.json",
+#                         'AA_BiGRU':"./config/gru_hyper_params.json",
+#                         'AA_BiLSTM':"./config/lstm_hyper_params.json",
+#                         'SA_GRU':"./config/gru_hyper_params.json",
+#                         'SA_LSTM':"./config/lstm_hyper_params.json",
+#                         'SA_BiGRU':"./config/gru_hyper_params.json",
+#                         'SA_BiLSTM':"./config/lstm_hyper_params.json"}
 
     parser.add_argument('--data_path', type=str, help='Input dir for data')
     parser.add_argument('--model', choices=[m for m in model_config_path], default='AA_GRU')
@@ -226,10 +242,14 @@ if __name__ =="__main__":
     parser.add_argument('--n_fold', type=int, default=10 , help='n_fold')
     parser.add_argument('--batch_size', type=int, default=64,help='batch_size')
     parser.add_argument('--epochs', type=int, default=300,help='epochs')
+    parser.add_argument('--l2', type=float, default=0.5,help='l2')    
+    parser.add_argument('--l2_1', type=float, default=0.01 , help='l2_1')
+    parser.add_argument('--l2_2', type=float, default=0.01,help='l2_2')
+    parser.add_argument('--units', type=int, default=32,help='units')
     args = parser.parse_args()
 
     if args.load_pretrained == False:
-        delafo = DELAFO.from_existing_config(args.data_path,args.model,model_config_path,args.alpha,args.timesteps_input,args.timesteps_output,args.n_fold,args.batch_size,args.epochs)
+        delafo = DELAFO.from_existing_config(args.data_path,args.model,model_config_path,args.alpha,args.timesteps_input,args.timesteps_output,args.n_fold,args.batch_size,args.epochs,args.l2,args.l2_1,args.l2_2,args.units)
         delafo.train_model(args.n_fold,args.batch_size,args.epochs,args.alpha)
         delafo.save_model()
     else:
