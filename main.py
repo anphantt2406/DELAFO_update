@@ -46,6 +46,10 @@ class DELAFO:
          model = build_gru_model(hyper_params)
       elif model_name == "BiGRU":
          model = build_bigru_model(hyper_params)
+      elif model_name == "AA_GRU":
+         model = build_add_att_gru_model(hyper_params)
+      elif model_name == "AA_BiGRU":
+         model = build_add_att_bigru_model(hyper_params)
 #          if model_name == "ResNet":
 #             hyper_params = load_config_file(model_config_path[model_name])
 #             hyper_params['input_shape'] = (X.shape[1],X.shape[2],X.shape[3])
@@ -232,7 +236,7 @@ if __name__ =="__main__":
 #                         'SA_BiLSTM':"./config/lstm_hyper_params.json"}
 
     parser.add_argument('--data_path', type=str, help='Input dir for data')
-    parser.add_argument('--model', choices=[m for m in model_config_path], default='AA_GRU')
+    parser.add_argument('--model', choices=['GRU','BiGRU','AA_GRU','AA_BiGRU'], default='AA_GRU')
     parser.add_argument('--load_pretrained', type=bool, default=False,help='Load pretrain model')
     parser.add_argument('--model_path', type=str, default='',help='Path to pretrain model')
     parser.add_argument('--timesteps_input', type=int, default=64,help='timesteps (days) for input data')
