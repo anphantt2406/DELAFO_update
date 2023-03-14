@@ -34,7 +34,7 @@ class DELAFO:
     
    @classmethod
 #    def from_existing_config(cls,path_data,model_name,model_config_path,alpha = 0.5,timesteps_input=64,timesteps_output=19, n_fold = 10 ,batch_size = 64, epochs = 300):
-     def from_existing_config(cls,path_data,model_name,alpha = 0.5,timesteps_input=64,timesteps_output=19, n_fold = 10 ,batch_size = 64, epochs = 300, activation = "sigmoid", l2 = 0.05, l2_1 = 0.01, l2_2 = 0.01, units = 32):
+    def from_existing_config(cls,path_data,model_name,alpha = 0.5,timesteps_input=64,timesteps_output=19, n_fold = 10 ,batch_size = 64, epochs = 300, activation = "sigmoid", l2 = 0.05, l2_1 = 0.01, l2_2 = 0.01, units = 32):
          X,y,tickers = prepair_data(path_data,window_x=timesteps_input,window_y=timesteps_output)
          hyper_params = {"activation": activation,
                          "l2": l2,
