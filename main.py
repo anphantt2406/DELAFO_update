@@ -245,6 +245,8 @@ if __name__ =="__main__":
     parser.add_argument('--n_fold', type=int, default=10 , help='n_fold')
     parser.add_argument('--batch_size', type=int, default=64,help='batch_size')
     parser.add_argument('--epochs', type=int, default=300,help='epochs')
+      
+    parser.add_argument('--activation', choices=['sigmoid','softmax'], default= 'sigmoid',help='activation function')
     parser.add_argument('--l2', type=float, default=0.5,help='l2')    
     parser.add_argument('--l2_1', type=float, default=0.01 , help='l2_1')
     parser.add_argument('--l2_2', type=float, default=0.01,help='l2_2')
@@ -252,7 +254,7 @@ if __name__ =="__main__":
     args = parser.parse_args()
 
     if args.load_pretrained == False:
-        delafo = DELAFO.from_existing_config(args.data_path,args.model,args.alpha,args.timesteps_input,args.timesteps_output,args.n_fold,args.batch_size,args.epochs,args.l2,args.l2_1,args.l2_2,args.units)
+        delafo = DELAFO.from_existing_config(args.data_path,args.model,args.alpha,args.timesteps_input,args.timesteps_output,args.n_fold,args.batch_size,args.epochs,args.activation, args.l2,args.l2_1,args.l2_2,args.units)
         delafo.train_model(args.n_fold,args.batch_size,args.epochs,args.alpha)
         delafo.save_model()
     else:
