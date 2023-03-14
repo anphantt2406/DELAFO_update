@@ -36,24 +36,7 @@ def sharpe_ratio(y_true, y_pred):
     sharpeRatio = K.mean(rate, axis = 1)/K.maximum(K.std(rate, axis=1),epsilon)
 
     return K.mean(sharpeRatio)
-
-
-def load_config_file(path):
-    params = {"activation": "sigmoid",
-          "l2": 0.05,
-          "l2_1": 0.01,
-          "l2_2": 0.01,
-          "units": 32
-          }
-    params['input_shape'] = (X.shape[1],X.shape[2],X.shape[3])
-    units = params['units']
-    activation = params['activation']
-    reg1 = params['l2']
-    reg2 = params['l2_1']
-    lr = params['l2_2']
-    input_shape = params['input_shape']
-    ts = input_shape[1]
-    tick = input_shape[0] 
+ 
 
 # def load_config_file(path):
 #     with open(path,'r') as file:
