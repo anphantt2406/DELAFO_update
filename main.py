@@ -17,20 +17,20 @@ import matplotlib.pyplot as plt
 from keras.models import load_model
 class DELAFO:
    def __init__(self,model_name,model,X,y,tickers,alpha = 0.5,timesteps_input=64,timesteps_output=19, n_fold = 10 ,batch_size = 64, epochs = 300, activation = "sigmoid", l2 = 0.05, l2_1 = 0.01, l2_2 = 0.01, units = 32):
-        self.model_name = model_name
-        self.model = model
-        self.alpha = alpha
-        self.X,self.y,self.tickers = X,y,tickers
-        self.timesteps_input = timesteps_input
-        self.timesteps_output = timesteps_output
-        self.n_fold = n_fold
-        self.batch_size = batch_size
-        self.epochs = epochs
-        self.activation = activation
-        self.l2 = l2
-        self.l2_1 = l2_1
-        self.l2_2 = l2_2
-        self.units = units
+      self.model_name = model_name
+      self.model = model
+      self.alpha = alpha
+      self.X,self.y,self.tickers = X,y,tickers
+      self.timesteps_input = timesteps_input
+      self.timesteps_output = timesteps_output
+      self.n_fold = n_fold
+      self.batch_size = batch_size
+      self.epochs = epochs
+      self.activation = activation
+      self.l2 = l2
+      self.l2_1 = l2_1
+      self.l2_2 = l2_2
+      self.units = units
     
    @classmethod
    def from_existing_config(cls,path_data,model_name,alpha = 0.5,timesteps_input=64,timesteps_output=19, n_fold = 10 ,batch_size = 64, epochs = 300, activation = "sigmoid", l2 = 0.05, l2_1 = 0.01, l2_2 = 0.01, units = 32):
@@ -71,6 +71,9 @@ class DELAFO:
                         }
          hyper_params['input_shape'] = (X.shape[1],X.shape[2],X.shape[3])
          model = build_add_att_bigru_model(hyper_params)
+      model._name = model_name
+      print(model.summary())
+      return cls(model_name,model,X,y,tickers,timesteps_input,timesteps_output)
 #          if model_name == "ResNet":
 #             hyper_params = load_config_file(model_config_path[model_name])
 #             hyper_params['input_shape'] = (X.shape[1],X.shape[2],X.shape[3])
@@ -123,9 +126,6 @@ class DELAFO:
 # #             hyper_params = load_config_file(model_config_path[model_name])
 #             hyper_params['input_shape'] = (X.shape[1],X.shape[2],X.shape[3])
 #             model = build_selfatt_bilstm_model(hyper_params)
-         model._name = model_name
-         print(model.summary())
-         return cls(model_name,model,X,y,tickers,timesteps_input,timesteps_output)
       
    @classmethod
    def from_saved_model(cls,path_data,model_path,timesteps_output):
