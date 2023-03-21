@@ -16,7 +16,6 @@ def prepair_data(path,window_x,window_y,close_fill= ['interpolate','ffill'], vol
     ## select tickers not nan in final day
     columns = df.close.columns[~df.close.iloc[-1].isna()]
     df = df.iloc[:, df.columns.get_level_values(1).isin(columns)]
-    df = df.sort_values(['ticker', 'date'], ascending = [True, True])
     #fill missing data
     for m in close_fill:
         if (m =='interpolate'):
