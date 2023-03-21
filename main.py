@@ -27,7 +27,7 @@ class DELAFO:
 		self.l2, self.l2_1, self.l2_2, self.units= l2,l2_1,l2_2, units
 	@classmethod
 	def from_existing_config(cls,path_data,model_name,alpha = 0.5,timesteps_input=64,timesteps_output=19,close_fill='ffill',vol_fill='fill0',return_fill='fill0',n_fold=10,batch_size=64,epochs=300,activation="sigmoid",l2=0.05,l2_1=0.01,l2_2= 0.01,units=32):
-		X,y,tickers = prepair_data(path_data,window_x=timesteps_input,window_y=timesteps_output, close_fill, vol_fill, return_fill)
+		X,y,tickers = prepair_data(path_data,window_x=timesteps_input,window_y=timesteps_output, close_fill='ffill',vol_fill='fill0',return_fill='fill0')
 		if model_name == "GRU":
 			hyper_params = {"activation": activation,
 					"l2": l2,
