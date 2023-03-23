@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import pickle
 from sklearn.model_selection import train_test_split
-def prepair_data(path,window_x,window_y,close_fill= ['interpolate','ffill'], vol_fill= ['interpolate','fill0'], return_fill=['interpolate','fill0']):
+def prepair_data(path,window_x,window_y,close= ['interpolate','ffill'], vol= ['interpolate','fill0'], dailyreturn=['interpolate','fill0']):
     df = pd.read_csv(path)
     df['date'] = df.date.apply(pd.Timestamp)
 
@@ -17,7 +17,7 @@ def prepair_data(path,window_x,window_y,close_fill= ['interpolate','ffill'], vol
     columns = df.close.columns[~df.close.iloc[-1].isna()]
     df = df.iloc[:, df.columns.get_level_values(1).isin(columns)]
     #fill missing data
-    for m in close_fill:
+    for m in close:
         if (m =='interpolate'):
             df.close = df.close.interpolate(method='linear',limit_area='inside',limit_direction='both', axis=0)
         elif (m == 'ffill'):
@@ -25,7 +25,7 @@ def prepair_data(path,window_x,window_y,close_fill= ['interpolate','ffill'], vol
         else:
           print('Error: Please enter the correct method of fill missing data')
     
-    for m in vol_fill:
+    for m in vol:
         if (m =='interpolate'):
             df.volume = df.volume.interpolate(method='linear',limit_area='inside',limit_direction='both', axis=0)
         elif (m == 'fill0'):
@@ -36,7 +36,7 @@ def prepair_data(path,window_x,window_y,close_fill= ['interpolate','ffill'], vol
     close = df.close
     daily_return = ((close.shift(-1) - close)/close).shift(1)
 #     daily_return = (close.apply(lambda x: np.log(x) - np.log(x.shift(1)))).iloc[1:]
-    for m in return_fill:
+    for m in dailyreturn:
         if (m =='interpolate'):
             daily_return = daily_return.interpolate(method='linear',limit_area="inside",limit_direction='both', axis=0)
         elif (m == 'fill0'):
