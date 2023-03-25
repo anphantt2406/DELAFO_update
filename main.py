@@ -137,7 +137,7 @@ class DELAFO:
 			json.dump(his, outfile,cls=MyEncoder, indent=2)
 		print("write file log at %s"%(os.path.join(path_dir,name_file)))
 	
-	def train_model(self,n_fold = 10, batch_size = 64, epochs = 300, alpha = 0.5):
+	def train_model(self,n_fold = 10, batch_size = 64, epochs = 200, alpha = 0.5):
 		tf.random.set_seed(42)
 		tscv = TimeSeriesSplit(n_splits=n_fold)
 		all_ratio = []
@@ -220,6 +220,7 @@ class DELAFO:
 		plt.savefig(os.path.join(new_path,'1.png'))
 
 if __name__ =="__main__":
+	tf.random.set_seed(42)
 	parser = argparse.ArgumentParser()
     ## path for config_file of each model
 #     model_config_path = {'ResNet':"./config/resnet_hyper_params.json",
@@ -248,7 +249,7 @@ if __name__ =="__main__":
 	parser.add_argument('--return_fill', choices=['interpolate','fill0'], default='interpolate',help='fill missing value for daily return')    
 	parser.add_argument('--n_fold', type=int, default=10 , help='n_fold')
 	parser.add_argument('--batch_size', type=int, default=64,help='batch_size')
-	parser.add_argument('--epochs', type=int, default=300,help='epochs')
+	parser.add_argument('--epochs', type=int, default=200,help='epochs')
 	parser.add_argument('--activation', choices=['sigmoid','softmax'], default= 'sigmoid',help='activation function')
 	parser.add_argument('--l2', type=float, default=0.5,help='l2')    
 	parser.add_argument('--l2_1', type=float, default=0.01 , help='l2_1')
