@@ -60,6 +60,22 @@ class DELAFO:
 					"units": units}
 			hyper_params['input_shape'] = (X.shape[1],X.shape[2],X.shape[3])
 			model = build_add_att_bigru_model(hyper_params)
+		elif model_name == "SA_GRU":
+			hyper_params = {"activation": activation,
+					"l2": l2,
+					"l2_1": l2_1,
+					"l2_2": l2_2,
+					"units": units}
+			hyper_params['input_shape'] = (X.shape[1],X.shape[2],X.shape[3])
+			model = build_selfatt_gru_model(hyper_params)
+		elif model_name == "SA_BiGRU":
+			hyper_params = {"activation": activation,
+					"l2": l2,
+					"l2_1": l2_1,
+					"l2_2": l2_2,
+					"units": units}
+			hyper_params['input_shape'] = (X.shape[1],X.shape[2],X.shape[3])
+			model = build_selfatt_bigru_model(hyper_params)
 		model._name = model_name
 		print(model.summary())
 		return cls(model_name,model,X,y,tickers,timesteps_input,timesteps_output)
@@ -138,6 +154,9 @@ class DELAFO:
 		print("write file log at %s"%(os.path.join(path_dir,name_file)))
 	
 	def train_model(self,n_fold = 10, batch_size = 64, epochs = 200, alpha = 0.5):
+# 		tf.random.set_seed(42)
+		np.random.RandomState(42)
+		tf.compat.v1.set_random_seed(42)
 		tf.random.set_seed(42)
 		tscv = TimeSeriesSplit(n_splits=n_fold)
 		all_ratio = []
@@ -220,6 +239,9 @@ class DELAFO:
 		plt.savefig(os.path.join(new_path,'1.png'))
 
 if __name__ =="__main__":
+# 	tf.random.set_seed(42)
+	np.random.RandomState(42)
+	tf.compat.v1.set_random_seed(42)
 	tf.random.set_seed(42)
 	parser = argparse.ArgumentParser()
     ## path for config_file of each model
@@ -238,7 +260,7 @@ if __name__ =="__main__":
 #                         'SA_BiLSTM':"./config/lstm_hyper_params.json"}
 # ,close_fill='ffill',vol_fill='fill0',return_fill='fill0'
 	parser.add_argument('--data_path', type=str, help='Input dir for data')
-	parser.add_argument('--model', choices=['GRU','BiGRU','AA_GRU','AA_BiGRU'], default='AA_GRU')
+	parser.add_argument('--model', choices=['GRU','BiGRU','AA_GRU','AA_BiGRU','SA_GRU','SA_BiGRU'], default='AA_GRU')
 	parser.add_argument('--load_pretrained', type=bool, default=False,help='Load pretrain model')
 	parser.add_argument('--model_path', type=str, default='',help='Path to pretrain model')
 	parser.add_argument('--timesteps_input', type=int, default=64,help='timesteps (days) for input data')
