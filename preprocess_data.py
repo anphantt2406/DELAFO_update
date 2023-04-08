@@ -2,15 +2,46 @@ import pandas as pd
 import numpy as np
 import pickle
 from sklearn.model_selection import train_test_split
-def prepair_data(path,window_x,window_y,close= ['interpolate','ffill'], vol= ['interpolate','fill0'], dailyreturn=['interpolate','fill0']):
-    df = pd.read_csv(path)
-    df['date'] = df.date.apply(pd.Timestamp)
+def calculateEma(series, period, keep_length= True):
+    ema = []
+    num_ticker = series.shape[1]
+    empty = [0 for _ in range(num_ticker)]
+    if keep_length:
+        ema = [empty for _ in range(period - 1)]
+    # print(ema)
 
+    #get n sma first and calculate the next n period ema
+    sma = sum(series[:period]) / period
+    multiplier = 2 / float(1 + period)
+    ema.append(sma)
+    j = len(ema)
+
+    #EMA(current) = ( (Price(current) - EMA(prev) ) x Multiplier) + EMA(prev)
+    ema.append(((series[period] - sma) * multiplier) + sma)
+
+    #now calculate the rest of the values
+    for i in series[period+1:]:
+        tmp = ((i - ema[j]) * multiplier) + ema[j]
+        j = j + 1
+        ema.append(tmp)
+    return np.asarray(ema, dtype= np.float32)
+
+def prepair_data(path,window_x,window_y,close= ['interpolate','ffill'], vol= ['interpolate','fill0'], dailyreturn=['interpolate','fill0']):
+    df = pd.read_csv(path)   
+    df['date'] = df.date.apply(pd.Timestamp)
     df['dow'] = df.date.apply(lambda x: x.dayofweek)
     ## just select working days
     df = df[(df.dow<=4)&(df.dow>=0)]
     df = df.drop(['dow'],axis=1)
-
+    
+#     df = df[df['date']== max(df['date'])]
+    df['marketcap'] = df['close']*df['volume']
+    # Sort the DataFrame by column 'marketcap' in descending order
+    df = df.sort_values(by='marketcap', ascending=False)
+    # Filter the top 50 values
+    df = df.head(50)   
+    
+    
     df = df.pivot_table(index='date', columns='ticker')
 
     ## select tickers not nan in final day
