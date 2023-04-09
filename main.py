@@ -15,7 +15,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from keras.models import load_model
 class DELAFO:
-	def __init__(self,model_name,model,X,y,tickers,timesteps_input=64,timesteps_output=19,last_date=2022-12-31,top_n=50, ema=10,alpha=0.5,close_fill='ffill',vol_fill='fill0',n_fold=10,batch_size=128,epochs=300,activation="sigmoid",l2=0.001,l2_1=0.01,l2_2= 0.01,units=32):
+	def __init__(self,model_name,model,X,y,tickers,ema,timesteps_input=64,timesteps_output=19,last_date=2022-12-31,top_n=50, alpha=0.5,close_fill='ffill',vol_fill='fill0',n_fold=10,batch_size=128,epochs=300,activation="sigmoid",l2=0.001,l2_1=0.01,l2_2= 0.01,units=32):
 		self.model_name = model_name
 		self.model = model
 		self.alpha = alpha
