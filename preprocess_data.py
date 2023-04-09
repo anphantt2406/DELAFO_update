@@ -2,6 +2,14 @@ import pandas as pd
 import numpy as np
 import pickle
 from sklearn.model_selection import train_test_split
+def filter_marketcap(data,last_day,top_n):
+    df = pd.read_csv(data,index_col = 0,parse_dates = [0])
+    df = df[df.index <= last_day]
+    df_last = df.iloc[-1,:]
+    df_sorted = df_last.nlargest(top_n)
+    return df_sorted.index
+    
+
 def calculateEma(series, period, keep_length= True):
     ema = []
     num_ticker = series.shape[1]
@@ -26,26 +34,19 @@ def calculateEma(series, period, keep_length= True):
         ema.append(tmp)
     return np.asarray(ema, dtype= np.float32)
 
-def prepair_data(path,window_x,window_y,close= ['interpolate','ffill'], vol= ['interpolate','fill0'], dailyreturn=['interpolate','fill0']):
+def prepair_data(path, marketcap, last_date, n=50,window_x,window_y,close= ['interpolate','ffill'], vol= ['interpolate','fill0'], dailyreturn=['interpolate','fill0'], periods, training= True):
     df = pd.read_csv(path)   
     df['date'] = df.date.apply(pd.Timestamp)
     df['dow'] = df.date.apply(lambda x: x.dayofweek)
     ## just select working days
     df = df[(df.dow<=4)&(df.dow>=0)]
     df = df.drop(['dow'],axis=1)
-    
-#     df = df[df['date']== max(df['date'])]
-    df['marketcap'] = df['close']*df['volume']
-    # Sort the DataFrame by column 'marketcap' in descending order
-    df = df.sort_values(by='marketcap', ascending=False)
-    # Filter the top 50 values
-    df = df.head(50)   
-    
-    
     df = df.pivot_table(index='date', columns='ticker')
 
     ## select tickers not nan in final day
-    columns = df.close.columns[~df.close.iloc[-1].isna()]
+#     columns = df.close.columns[~df.close.iloc[-1].isna()]
+# select tickers in top_n marketcap
+    columns = filter_marketcap(marketcap,last_date,n)
     df = df.iloc[:, df.columns.get_level_values(1).isin(columns)]
     #fill missing data
     for m in close:
@@ -87,11 +88,24 @@ def prepair_data(path,window_x,window_y,close= ['interpolate','ffill'], vol= ['i
     ## fill X
     ##fill nan by 0.0
     X[np.isnan(X)] = 0.0
-
     ## fill y
     y[np.isnan(y)] = -1e2
     # y[np.isnan(y)] = 0
-
+    
+    if isinstance(periods, int):
+        periods = [periods]
+        max_period = max(periods)
+    if max_period != 0:
+        for period in periods:
+            ema  = calculateEma(close, period)
+            X = np.concatenate((X, ema[:, np.newaxis, :]), axis=1)
+    
+    X = X[max_period:]
+    y = y[max_period:]
+    if training:
+        X = rolling_array(X[:-window_y],stepsize=1,window=window_x)
+        y = rolling_array(y[window_x:],stepsize=1,window=window_y)
+        y = np.swapaxes(y,1,2)
     # X1 = rolling_array(X[window_x:],stepsize=1,window=window_y)
 
     X = rolling_array(X[:-window_y],stepsize=1,window=window_x)
