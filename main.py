@@ -16,14 +16,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 from keras.models import load_model
 class DELAFO:
-	def __init__(self,model_name,model,X,y,tickers,ema,timesteps_input=64,timesteps_output=19,last_date=2022-12-31,top_n=50, alpha=0.5,close_fill='ffill',vol_fill='fill0',n_fold=10,batch_size=128,epochs=300,activation="sigmoid",l2=0.001,l2_1=0.01,l2_2= 0.01,units=32):
+	def __init__(self,model_name,model,X,y,tickers,timesteps_input=64,timesteps_output=19,last_date=2022-12-31,top_n=50, alpha=0.5,close_fill='ffill',vol_fill='fill0',n_fold=10,batch_size=128,epochs=300,activation="sigmoid",l2=0.001,l2_1=0.01,l2_2= 0.01,units=32):
 		self.model_name = model_name
 		self.model = model
 		self.alpha = alpha
 		self.X,self.y,self.tickers = X,y,tickers
 		self.last_date = last_date
 		self.top_n = top_n
-		self.ema = ema
+# 		self.ema = ema
 		self.close_fill, self.vol_fill = close_fill, vol_fill
 		self.timesteps_input, self.timesteps_output = timesteps_input, timesteps_output		
 		self.n_fold, self.batch_size, self.epochs = n_fold, batch_size, epochs
@@ -31,7 +31,7 @@ class DELAFO:
 		self.l2, self.l2_1, self.l2_2, self.units= l2,l2_1,l2_2, units
 	@classmethod
 	def from_existing_config(cls,path_data,path_marketcap,last_date, top_n, periods, model_name,alpha = 0.5,timesteps_input=64,timesteps_output=19,close_fill='ffill',vol_fill='fill0',n_fold=10,batch_size=128,epochs=300,activation="sigmoid",l2=0.001,l2_1=0.01,l2_2= 0.01,units=32):
-		X,y,tickers = prepair_data(path_data, path_marketcap, last_date,n=top_n,window_x=timesteps_input,window_y=timesteps_output, close=close_fill, vol=vol_fill, periods=ema, training= True)
+		X,y,tickers = prepair_data(path_data, path_marketcap, last_date,n=top_n,window_x=timesteps_input,window_y=timesteps_output, close=close_fill, vol=vol_fill)
 		if model_name == "GRU":
 			hyper_params = {"activation": activation,
 					"l2": l2,
@@ -267,7 +267,7 @@ if __name__ =="__main__":
 	parser.add_argument('--path_marketcap', type=str, help='Input dir for marketcap data')
 	parser.add_argument('--last_date', type=datetime.date, default=2021-12-31,help='date for filtering marketcap')
 	parser.add_argument('--top_n', type=int, default=50,help='top n of tickers have highest marketcap')
-	parser.add_argument('--periods', nargs="+", type=float, help='A list of numbers (separated by spaces)')
+# 	parser.add_argument('--periods', nargs="+", type=float, help='A list of numbers (separated by spaces)')
 	parser.add_argument('--model', choices=['GRU','BiGRU','AA_GRU','AA_BiGRU','SA_GRU','SA_BiGRU'], default='AA_GRU')
 	parser.add_argument('--load_pretrained', type=bool, default=False,help='Load pretrain model')
 	parser.add_argument('--model_path', type=str, default='',help='Path to pretrain model')
@@ -287,7 +287,7 @@ if __name__ =="__main__":
 	args = parser.parse_args()
 	
 	if args.load_pretrained == False:
-		delafo = DELAFO.from_existing_config(args.data_path,args.path_marketcap,args.last_date,args.top_n,args.periods,args.model,args.alpha,args.timesteps_input,args.timesteps_output,args.close_fill,args.vol_fill,args.n_fold,args.batch_size,args.epochs,args.activation, args.l2,args.l2_1,args.l2_2,args.units)
+		delafo = DELAFO.from_existing_config(args.data_path,args.path_marketcap,args.last_date,args.top_n,args.model,args.alpha,args.timesteps_input,args.timesteps_output,args.close_fill,args.vol_fill,args.n_fold,args.batch_size,args.epochs,args.activation, args.l2,args.l2_1,args.l2_2,args.units)
 		delafo.train_model(args.n_fold,args.batch_size,args.epochs,args.alpha)
 		delafo.save_model()
 	else:
