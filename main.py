@@ -265,7 +265,7 @@ if __name__ =="__main__":
 # ,close_fill='ffill',vol_fill='fill0',return_fill='fill0'
 	parser.add_argument('--data_path', type=str, help='Input dir for data')
 	parser.add_argument('--path_marketcap', type=str, help='Input dir for marketcap data')
-	parser.add_argument('--last_date', type=datetime.date, default='2021-12-31',help='date for filtering marketcap')
+	parser.add_argument('--last_date', type=datetime.date, default=2021-12-31,help='date for filtering marketcap')
 	parser.add_argument('--top_n', type=int, default=50,help='top n of tickers have highest marketcap')
 	parser.add_argument('--periods', nargs="+", type=float, help='A list of numbers (separated by spaces)')
 	parser.add_argument('--model', choices=['GRU','BiGRU','AA_GRU','AA_BiGRU','SA_GRU','SA_BiGRU'], default='AA_GRU')
