@@ -1,5 +1,6 @@
 import argparse
 from datetime import datetime
+from datetime import date
 from preprocess_data import *
 from utils import *
 from models.addatt_RNN import *
