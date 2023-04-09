@@ -15,14 +15,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 from keras.models import load_model
 class DELAFO:
-	def __init__(self,model_name,model,X,y,tickers,timesteps_input=64,timesteps_output=19,last_date=2022-12-31,top_n=50, periods=10,alpha=0.5,close_fill='ffill',vol_fill='fill0',n_fold=10,batch_size=128,epochs=300,activation="sigmoid",l2=0.001,l2_1=0.01,l2_2= 0.01,units=32):
+	def __init__(self,model_name,model,X,y,tickers,timesteps_input=64,timesteps_output=19,last_date=2022-12-31,top_n=50, ema=10,alpha=0.5,close_fill='ffill',vol_fill='fill0',n_fold=10,batch_size=128,epochs=300,activation="sigmoid",l2=0.001,l2_1=0.01,l2_2= 0.01,units=32):
 		self.model_name = model_name
 		self.model = model
 		self.alpha = alpha
 		self.X,self.y,self.tickers = X,y,tickers
 		self.last_date = last_date
 		self.top_n = top_n
-		self.periods = periods
+		self.ema = ema
 		self.close_fill, self.vol_fill = close_fill, vol_fill
 		self.timesteps_input, self.timesteps_output = timesteps_input, timesteps_output		
 		self.n_fold, self.batch_size, self.epochs = n_fold, batch_size, epochs
@@ -30,7 +30,7 @@ class DELAFO:
 		self.l2, self.l2_1, self.l2_2, self.units= l2,l2_1,l2_2, units
 	@classmethod
 	def from_existing_config(cls,path_data,path_marketcap,last_date, top_n, periods, model_name,alpha = 0.5,timesteps_input=64,timesteps_output=19,close_fill='ffill',vol_fill='fill0',n_fold=10,batch_size=128,epochs=300,activation="sigmoid",l2=0.001,l2_1=0.01,l2_2= 0.01,units=32):
-		X,y,tickers = prepair_data(path_data, path_marketcap, last_date,n=top_n,window_x=timesteps_input,window_y=timesteps_output, close=close_fill, vol=vol_fill, periods, training= True)
+		X,y,tickers = prepair_data(path_data, path_marketcap, last_date,n=top_n,window_x=timesteps_input,window_y=timesteps_output, close=close_fill, vol=vol_fill, periods=ema, training= True)
 		if model_name == "GRU":
 			hyper_params = {"activation": activation,
 					"l2": l2,
