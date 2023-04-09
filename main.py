@@ -15,19 +15,22 @@ import numpy as np
 import matplotlib.pyplot as plt
 from keras.models import load_model
 class DELAFO:
-	def __init__(self,model_name,model,X,y,tickers,alpha = 0.5,timesteps_input=64,timesteps_output=19,close_fill='interpolate',vol_fill='interpolate',return_fill='interpolate',n_fold=10,batch_size=64,epochs=300,activation="sigmoid",l2=0.05,l2_1=0.01,l2_2=0.01,units=32):
+	def __init__(self,model_name,model,X,y,tickers,last_date, top_n, periods,alpha,timesteps_input=64,timesteps_output=19,close_fill,vol_fill,n_fold,batch_size,epochs,activation,l2,l2_1,l2_2,units):
 		self.model_name = model_name
 		self.model = model
 		self.alpha = alpha
 		self.X,self.y,self.tickers = X,y,tickers
-		self.close_fill, self.vol_fill, self.return_fill = close_fill, vol_fill, return_fill
+		self.last_date = last_date
+		self.top_n = top_n
+		self.periods = periods
+		self.close_fill, self.vol_fill = close_fill, vol_fill
 		self.timesteps_input, self.timesteps_output = timesteps_input, timesteps_output		
 		self.n_fold, self.batch_size, self.epochs = n_fold, batch_size, epochs
 		self.activation = activation
 		self.l2, self.l2_1, self.l2_2, self.units= l2,l2_1,l2_2, units
 	@classmethod
-	def from_existing_config(cls,path_data,model_name,alpha = 0.5,timesteps_input=64,timesteps_output=19,close_fill='interpolate',vol_fill='interpolate',return_fill='interpolate',n_fold=10,batch_size=64,epochs=300,activation="sigmoid",l2=0.05,l2_1=0.01,l2_2= 0.01,units=32):
-		X,y,tickers = prepair_data(path_data,window_x=timesteps_input,window_y=timesteps_output, close=close_fill, vol=vol_fill,dailyreturn=return_fill)
+	def from_existing_config(cls,path_data,path_marketcap,last_date, top_n=50, periods, model_name,alpha = 0.5,timesteps_input=64,timesteps_output=19,close_fill='ffill',vol_fill='fill0',n_fold=10,batch_size=128,epochs=300,activation="sigmoid",l2=0.001,l2_1=0.01,l2_2= 0.01,units=32):
+		X,y,tickers = prepair_data(path_data, path_marketcap, last_date,n=top_n,window_x=timesteps_input,window_y=timesteps_output, close=close_fill, vol=vol_fill, periods, training= True)
 		if model_name == "GRU":
 			hyper_params = {"activation": activation,
 					"l2": l2,
@@ -153,7 +156,7 @@ class DELAFO:
 			json.dump(his, outfile,cls=MyEncoder, indent=2)
 		print("write file log at %s"%(os.path.join(path_dir,name_file)))
 	
-	def train_model(self,n_fold = 10, batch_size = 64, epochs = 200, alpha = 0.5):
+	def train_model(self,n_fold = 10, batch_size = 128, epochs = 300, alpha = 0.5):
 # 		tf.random.set_seed(42)
 		np.random.RandomState(42)
 		tf.compat.v1.set_random_seed(42)
@@ -260,6 +263,10 @@ if __name__ =="__main__":
 #                         'SA_BiLSTM':"./config/lstm_hyper_params.json"}
 # ,close_fill='ffill',vol_fill='fill0',return_fill='fill0'
 	parser.add_argument('--data_path', type=str, help='Input dir for data')
+	parser.add_argument('--path_marketcap', type=str, help='Input dir for marketcap data')
+	parser.add_argument('--last_date', type==lambda d: datetime.strptime(d, '%Y%m%d'), default='2021-12-31',help='date for filtering marketcap')
+	parser.add_argument('--top_n', type=int, default=50,help='top n of tickers have highest marketcap')
+	parser.add_argument('--periods', nargs="+", default=[10, 34])
 	parser.add_argument('--model', choices=['GRU','BiGRU','AA_GRU','AA_BiGRU','SA_GRU','SA_BiGRU'], default='AA_GRU')
 	parser.add_argument('--load_pretrained', type=bool, default=False,help='Load pretrain model')
 	parser.add_argument('--model_path', type=str, default='',help='Path to pretrain model')
@@ -267,20 +274,19 @@ if __name__ =="__main__":
 	parser.add_argument('--timesteps_output', type=int, default=19,help='timesteps (days) for output data ')
 	parser.add_argument('--alpha', type=float, default=0.5,help='Input Threshold')    
 	parser.add_argument('--close_fill', choices=['interpolate','ffill'], default='interpolate',help='fill missing value for close price')
-	parser.add_argument('--vol_fill', choices=['interpolate','fill0'], default='interpolate',help='fill missing value for volume')
-	parser.add_argument('--return_fill', choices=['interpolate','fill0'], default='interpolate',help='fill missing value for daily return')    
+	parser.add_argument('--vol_fill', choices=['interpolate','fill0'], default='interpolate',help='fill missing value for volume')  
 	parser.add_argument('--n_fold', type=int, default=10 , help='n_fold')
 	parser.add_argument('--batch_size', type=int, default=128,help='batch_size')
 	parser.add_argument('--epochs', type=int, default=300,help='epochs')
 	parser.add_argument('--activation', choices=['sigmoid','softmax'], default= 'sigmoid',help='activation function')
-	parser.add_argument('--l2', type=float, default=0.0005,help='l2')    
+	parser.add_argument('--l2', type=float, default=0.001,help='l2')    
 	parser.add_argument('--l2_1', type=float, default=0.01 , help='l2_1')
 	parser.add_argument('--l2_2', type=float, default=0.01,help='l2_2')
 	parser.add_argument('--units', type=int, default=32,help='units')
 	args = parser.parse_args()
 	
 	if args.load_pretrained == False:
-		delafo = DELAFO.from_existing_config(args.data_path,args.model,args.alpha,args.timesteps_input,args.timesteps_output,args.close_fill,args.vol_fill,args.return_fill,args.n_fold,args.batch_size,args.epochs,args.activation, args.l2,args.l2_1,args.l2_2,args.units)
+		delafo = DELAFO.from_existing_config(args.data_path,args.path_marketcap,args.last_date,args.top_n,args.periods,args.model,args.alpha,args.timesteps_input,args.timesteps_output,args.close_fill,args.vol_fill,args.return_fill,args.n_fold,args.batch_size,args.epochs,args.activation, args.l2,args.l2_1,args.l2_2,args.units)
 		delafo.train_model(args.n_fold,args.batch_size,args.epochs,args.alpha)
 		delafo.save_model()
 	else:
