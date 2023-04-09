@@ -22,7 +22,7 @@ class DELAFO:
 		self.model = model
 		self.alpha = alpha
 		self.X,self.y,self.tickers = X,y,tickers
-		self.last_date = last_date
+		self.last_date = np.datetime64(last_date)
 		self.top_n = top_n
 # 		self.ema = ema
 		self.close_fill, self.vol_fill = close_fill, vol_fill
