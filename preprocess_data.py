@@ -34,7 +34,7 @@ def calculateEma(series, period, keep_length= True):
         ema.append(tmp)
     return np.asarray(ema, dtype= np.float32)
 
-def prepair_data(path, marketcap, last_date, n,window_x,window_y,close= ['interpolate','ffill'], vol= ['interpolate','fill0'], dailyreturn=['interpolate','fill0'], periods, training= True):
+def prepair_data(path, marketcap, last_date, n,window_x,window_y,close= ['interpolate','ffill'], vol= ['interpolate','fill0'], periods, training= True):
     df = pd.read_csv(path)   
     df['date'] = df.date.apply(pd.Timestamp)
     df['dow'] = df.date.apply(lambda x: x.dayofweek)
@@ -67,14 +67,15 @@ def prepair_data(path, marketcap, last_date, n,window_x,window_y,close= ['interp
 
     close = df.close
     daily_return = ((close.shift(-1) - close)/close).shift(1)
+    daily_return = daily_return.fillna(0)
 #     daily_return = (close.apply(lambda x: np.log(x) - np.log(x.shift(1)))).iloc[1:]
-    for m in dailyreturn:
-        if (m =='interpolate'):
-            daily_return = daily_return.interpolate(method='linear',limit_area="inside",limit_direction='both', axis=0)
-        elif (m == 'fill0'):
-            daily_return = daily_return.fillna(0)
-        else:
-            print('Error: Please enter the correct method of fill missing data')
+#     for m in dailyreturn:
+#         if (m =='interpolate'):
+#             daily_return = daily_return.interpolate(method='linear',limit_area="inside",limit_direction='both', axis=0)
+#         elif (m == 'fill0'):
+#             daily_return = daily_return.fillna(0)
+#         else:
+#             print('Error: Please enter the correct method of fill missing data')
 
     # daily_return = daily_return.fillna(daily_return.min(axis=0),axis=0)
     # daily_return = daily_return.fillna(daily_return.min(axis=0),inplace=True)
