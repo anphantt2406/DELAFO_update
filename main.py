@@ -16,7 +16,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from keras.models import load_model
 class DELAFO:
-	def __init__(self,model_name,model,X,y,tickers,timesteps_input=64,timesteps_output=19,last_date=2022-12-31,top_n=50, alpha=0.5,close_fill='ffill',vol_fill='fill0',n_fold=10,batch_size=128,epochs=300,activation="sigmoid",l2=0.001,l2_1=0.01,l2_2= 0.01,units=32):
+	def __init__(self,model_name,model,X,y,tickers,timesteps_input=64,timesteps_output=19,last_date=date(2022, 12, 31),top_n=50, alpha=0.5,close_fill='ffill',vol_fill='fill0',n_fold=10,batch_size=128,epochs=300,activation="sigmoid",l2=0.001,l2_1=0.01,l2_2= 0.01,units=32):
 		self.model_name = model_name
 		self.model = model
 		self.alpha = alpha
@@ -265,7 +265,7 @@ if __name__ =="__main__":
 # ,close_fill='ffill',vol_fill='fill0',return_fill='fill0'
 	parser.add_argument('--data_path', type=str, help='Input dir for data')
 	parser.add_argument('--path_marketcap', type=str, help='Input dir for marketcap data')
-	parser.add_argument('--last_date', type=datetime.date, default=2021-12-31,help='date for filtering marketcap')
+	parser.add_argument('--last_date', type=datetime.date, default=date(2022, 12, 31),help='date for filtering marketcap')
 	parser.add_argument('--top_n', type=int, default=50,help='top n of tickers have highest marketcap')
 # 	parser.add_argument('--periods', nargs="+", type=float, help='A list of numbers (separated by spaces)')
 	parser.add_argument('--model', choices=['GRU','BiGRU','AA_GRU','AA_BiGRU','SA_GRU','SA_BiGRU'], default='AA_GRU')
