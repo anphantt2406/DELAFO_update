@@ -34,7 +34,7 @@ def calculateEma(series, period, keep_length= True):
         ema.append(tmp)
     return np.asarray(ema, dtype= np.float32)
 
-def prepair_data(path, marketcap, last_date, n,window_x,window_y,close= ['interpolate','ffill'], vol= ['interpolate','fill0'], periods, training= True):
+def prepair_data(path, marketcap, last_date, n,window_x,window_y,periods, close= ['interpolate','ffill'], vol= ['interpolate','fill0'], training= True):
     df = pd.read_csv(path)   
     df['date'] = df.date.apply(pd.Timestamp)
     df['dow'] = df.date.apply(lambda x: x.dayofweek)
