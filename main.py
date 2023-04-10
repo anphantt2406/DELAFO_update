@@ -179,11 +179,11 @@ class DELAFO:
 			print('Sharpe ratio of this portfolio: %s' % str([self.calc_sharpe_ratio(mask_tickers[i],y_val[i]) for i in range(len(y_val))]))
          # all_ratio_k_fold = np.asarray(all_ratio)
          # mean_all_ratio_k_fold  = np.mean(all_ratio_k_fold , axis= 1)
-			print('For this fold_{}, Mean: {}, std {}'.format(k,np.mean(temp ), np.std(temp )))
+			print('For this fold_{}, Mean_last_fold: {}, std_last_fold: {}'.format(k,np.mean(temp ), np.std(temp )))
 			self.write_log(his,'./logs/%s' % self.model_name,"log_%d.txt"%(test_index[-1]))
 		all_ratio = np.asarray(all_ratio)
 		mean_all_ratio = np.mean(all_ratio, axis= 1)
-		print('Mean: {}, std {}'.format(np.mean(mean_all_ratio), np.std(mean_all_ratio)))
+		print('Mean_all: {}, std_all: {}'.format(np.mean(mean_all_ratio), np.std(mean_all_ratio)))
 		self.visualize_log('./logs',self.model_name)
 		his1 = his.history
       # summarize history for loss
