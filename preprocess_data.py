@@ -34,7 +34,7 @@ def calculateEma(series, period, keep_length= True):
         ema.append(tmp)
     return np.asarray(ema, dtype= np.float32)
 
-def prepair_data(path, marketcap, last_date, n,window_x,window_y, close=['interpolate','ffill'], vol=['interpolate','fill0']):
+def prepair_data(path, marketcap, last_date, n,window_x,window_y, close=['null','interpolate','ffill'], vol=['null','interpolate','fill0']):
     df = pd.read_csv(path)
     df['date'] = df.date.apply(pd.Timestamp)
     df['dow'] = df.date.apply(lambda x: x.dayofweek)
@@ -53,15 +53,21 @@ def prepair_data(path, marketcap, last_date, n,window_x,window_y, close=['interp
             df.close = df.close.interpolate(method='linear',limit_area='inside',limit_direction='both', axis=0)
         elif (m == 'ffill'):
             df.close = df.close.ffill()
+        elif (m == 'null'):
+            continue
         else:
           print('Error: Please enter the correct method of fill missing data')
+    
     for m in vol:
         if (m =='interpolate'):
             df.volume = df.volume.interpolate(method='linear',limit_area='inside',limit_direction='both', axis=0)
         elif (m == 'fill0'):
             df.volume = df.volume.fillna(0)
+        elif (m == 'null'):
+            continue
         else:
           print('Error: Please enter the correct method of fill missing data')
+    
     close = df.close
     daily_return = ((close.shift(-1) - close)/close).shift(1)
     tickers = df.close.columns
