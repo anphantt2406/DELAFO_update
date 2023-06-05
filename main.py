@@ -83,6 +83,8 @@ class DELAFO:
 			model = build_selfatt_bigru_model(hyper_params)
 		model._name = model_name
 		print(model.summary())
+		print("X-shape: ", X.shape)
+		print("y-shape: ", y.shape)
 		return cls(model_name,model,X,y,tickers,timesteps_input,timesteps_output)
 #          if model_name == "ResNet":
 #             hyper_params = load_config_file(model_config_path[model_name])
