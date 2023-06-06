@@ -107,7 +107,7 @@ class DELAFO:
 		    dpi=300,
 		    layer_range=None,
 		    show_layer_activations=False,
-		    show_trainable=False,show_shapes=True
+		    show_trainable=False,
 		)
 		return cls(model_name,model,X,y,tickers,timesteps_input,timesteps_output)
 #          if model_name == "ResNet":
