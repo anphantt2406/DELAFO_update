@@ -103,10 +103,10 @@ class DELAFO:
 		    show_dtype=False,
 		    show_layer_names=True,
 		    rankdir="TB",
-		    expand_nested=False,
+		    expand_nested=True,
 		    dpi=300,
-		    layer_range=None,
-		    show_layer_activations=False,
+		    layer_range=True,
+		    show_layer_activations=True,
 		    show_trainable=False,
 		)
 		return cls(model_name,model,X,y,tickers,timesteps_input,timesteps_output)
