@@ -1,4 +1,15 @@
 import argparse
+import os
+import sys
+
+import tensorflow.compat.v2 as tf
+
+from keras.utils import io_utils
+from keras.utils import layer_utils
+
+# isort: off
+from tensorflow.python.util.tf_export import keras_export
+
 from datetime import datetime
 from datetime import date
 from preprocess_data import *
@@ -85,6 +96,19 @@ class DELAFO:
 		print(model.summary())
 		print("X-shape: ", X.shape)
 		print("y-shape: ", y.shape)
+		tf.keras.utils.plot_model(
+		    model,
+		    to_file="model.png",
+		    show_shapes=False,
+		    show_dtype=False,
+		    show_layer_names=True,
+		    rankdir="TB",
+		    expand_nested=False,
+		    dpi=300,
+		    layer_range=None,
+		    show_layer_activations=False,
+		    show_trainable=False,
+		)
 		return cls(model_name,model,X,y,tickers,timesteps_input,timesteps_output)
 #          if model_name == "ResNet":
 #             hyper_params = load_config_file(model_config_path[model_name])
@@ -186,16 +210,16 @@ class DELAFO:
 		all_ratio = np.asarray(all_ratio)
 		mean_all_ratio = np.mean(all_ratio, axis= 1)
 		print('Mean_all: {}, std_all: {}'.format(np.mean(mean_all_ratio), np.std(mean_all_ratio)))
-		self.visualize_log('./logs',self.model_name)
-		his1 = his.history
-      # summarize history for loss
-		plt.plot(his.history['loss'])
-		plt.plot(his.history['val_loss'])
-		plt.title('model loss')
-		plt.ylabel('loss')
-		plt.xlabel('epoch')
-		plt.legend(['train', 'test'], loc='upper left')
-		plt.show()
+# 		self.visualize_log('./logs',self.model_name)
+# 		his1 = his.history
+#       # summarize history for loss
+# 		plt.plot(his.history['loss'])
+# 		plt.plot(his.history['val_loss'])
+# 		plt.title('model loss')
+# 		plt.ylabel('loss')
+# 		plt.xlabel('epoch')
+# 		plt.legend(['train', 'test'], loc='upper left')
+# 		plt.show()
 	
 	def save_model(self,path_dir="pretrain_model"):
 		if os.path.exists(os.path.join(path_dir,self.model_name))==False:
