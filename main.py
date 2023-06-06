@@ -103,9 +103,9 @@ class DELAFO:
 		    show_dtype=False,
 		    show_layer_names=True,
 		    rankdir="TB",
-		    expand_nested=True,
+		    expand_nested=False,
 		    dpi=300,
-		    layer_range=True,
+		    layer_range=False,
 		    show_layer_activations=True,
 		    show_trainable=False,
 		)
