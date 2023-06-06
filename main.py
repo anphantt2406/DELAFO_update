@@ -105,7 +105,7 @@ class DELAFO:
 		    rankdir="TB",
 		    expand_nested=False,
 		    dpi=300,
-		    layer_range=False,
+		    layer_range=None,
 		    show_layer_activations=True,
 		    show_trainable=False,
 		)
